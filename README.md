@@ -1,3 +1,5 @@
+# cpp_option_parser
+
 # Simple C++ option parser
 This library is used for option parsing and can be used in any command line software.
 The option parser uses only string options, and conversions have to be made when integer or floating values are wanted.
