@@ -1,13 +1,14 @@
 # cpp_option_parser
 
-# Simple C++ option parser
-This library can be used in any command line software for an easy option parsing.
+## Simple C++ option parser
++ This library can be used in any command line software for an easy option parsing.
 Accessed in code with [] operator, the options of the command line are encoded in string objects. Further conversion in integer or floating values can be made. This choice simplifies the code and make it python like.  
 
-Each option is represented by both a small and a long name, and also has a description and a default value. The short name is recognised on command line when preceded by a -, the long name with a --. 
++ Each option is represented by both a small and a long name, and also has a description and a default value. The short name is recognised on command line when preceded by a -, the long name with a --. 
 
-Note : If an option is required and no default value can be set, just precise it in the description and put a "" or a "?" as default value in the option declaration.
++ Note : If an option is required and no default value can be set, just precise it in the description and put a "" or a "?" as default value in the option declaration.
 
+## Use example
 Here is a short code to illustrate how to use library.
 
 ```c++
