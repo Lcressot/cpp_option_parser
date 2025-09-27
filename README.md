@@ -1,14 +1,10 @@
-# cpp_option_parser
+# Simple C++ option parser
+This library is used for option parsing and can be used in any C++ command line software.
+The option parser uses only string options, and conversions have to be made when integer or floating values are wanted.
+This choice has been made so that the parser is the same as the python option parser, and the operator [] can be used to acess the option values after the parsing.
 
-## Simple C++ option parser
-+ This library can be used in any command line software for an easy option parsing.
-Accessed in code with [] operator, the options of the command line are encoded in string objects. Further conversion in integer or floating values can be made. This choice simplifies the code and make it python like.  
+Each option is represented by a small and a long name, and is also given at declaration a description and a default value. The short name, respectively the long name, is recognised on command line only if preceded by a -, respectively a --. Once the command line has been parsed by the option parser, the options are accessible with the [] operator.
 
-+ Each option is represented by both a small and a long name, and also has a description and a default value. The short name is recognised on command line when preceded by a -, the long name with a --. 
-
-+ Note : If an option is required and no default value can be set, just precise it in the description and put a "" or a "?" as default value in the option declaration.
-
-## Use example
 Here is a short code to illustrate how to use library.
 
 ```c++
@@ -26,10 +22,10 @@ int main(int argc, char* argv[]){
 
     // create a OptionParser with options
     op::OptionParser opt;
-    opt.add_option("h", "help", "shows option help"); // no default value means boolean options, which default value is false
-    opt.add_option("w", "window_size", "window's size", "256" );
-    opt.add_option("r", "rate", "learning rate", "0.01" );
-    opt.add_option("m", "mode", "learning mode", "random" );
+    opt.add_option("h", "help", "shows option help", false); // no default value means boolean options, which default value is false
+    opt.add_option("w", "window_size", "window's size", "256", false);
+    opt.add_option("r", "rate", "learning rate", "", true ); // true indicates the option is required
+    opt.add_option("m", "mode", "learning mode", "random", false );
 
     // parse the options and verify that all went well. If not, errors and help will be shown
     bool correct_parsing = opt.parse_options(argc, argv);

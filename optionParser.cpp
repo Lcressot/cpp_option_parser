@@ -1,4 +1,5 @@
 #include "optionParser.hpp"
+#include <stdexcept>
 
 using namespace op;
 
@@ -23,23 +24,32 @@ double op::str2double(string value){
  return atof(value.c_str());
 }
 
+std::string op::stripPrefixDashes(const std::string& str) {
+    if (str.empty()) return str;
+    size_t start = 0;
+    if (str[0] == '-') start++;
+    if (start < str.size() && str[start] == '-') start++;
+    return str.substr(start);
+}
 
-op::Option::Option(string short_name, string long_name, string description, string default_value){
+op::Option::Option(string short_name, string long_name, string description, string default_value, bool is_required){
 	this->short_name = "-" + short_name;
 	this->long_name = "--" + long_name;
     this->description = description;
     this->default_value = default_value;
 	var = default_value;
 	_is_boolean = false;
+	_is_required = is_required;
 }
 
-op::Option::Option(string short_name, string long_name, string description, bool default_value){
+op::Option::Option(string short_name, string long_name, string description, bool default_value, bool is_required){
 	this->short_name = "-" + short_name;
 	this->long_name = "--" + long_name;
     this->description = description;
     this->default_value = bool2str(default_value);
 	var = bool2str(default_value);
 	_is_boolean = true;
+	_is_required = is_required;
 }
 
 
@@ -120,11 +130,11 @@ void op::OptionParser::show_help(){
 	cout << endl;
 }
 
-void op::OptionParser::add_option(string short_name, string long_name, string description, string default_value){
+void op::OptionParser::add_option(string short_name, string long_name, string description, string default_value, bool required){
 	if(has_option(short_name) || has_option(long_name))
-		throw string("Error when adding option " + long_name + ". Option already exists !");
+		throw std::runtime_error("Error when adding option " + long_name + ". Option already exists !");
 	
-	Option opt(short_name, long_name, description, default_value);
+	Option opt(short_name, long_name, description, default_value, required);
 	options.push_back(opt);
 	// update max sizes for a nice help printing
 	max_size_short = max(max_size_short, short_name.size());
@@ -133,11 +143,11 @@ void op::OptionParser::add_option(string short_name, string long_name, string de
 }
 
 // to add a boolean option
-void op::OptionParser::add_option(string short_name, string long_name, string description){
+void op::OptionParser::add_option(string short_name, string long_name, string description, bool required){
 	if(has_option(short_name) || has_option(long_name))
-		throw string("Error when adding option " + long_name + ". Option already exists !");
+		throw std::runtime_error("Error when adding option " + long_name + ". Option already exists !");
 
-	Option opt(short_name, long_name, description, false);
+	Option opt(short_name, long_name, description, false, required);
 	options.push_back(opt);
 	// update max sizes for a nice help printing
 	max_size_short = max(max_size_short, short_name.size());
@@ -151,19 +161,20 @@ bool op::OptionParser::parse_options(int& argc, char**& argv){
 	// for each argument, check all options
 	for(int i = 1; i<argc; i++){ // begin at 1 because of programm name
 		string arg(argv[i]);
-		bool option_recognised = false;
+		bool option_recognised = false;		
 		for( vector<Option>::iterator it=options.begin(); it!=options.end(); it++ ){
 			if(it->get_short_name() == arg || it->get_long_name() == arg){
 				// an argument name has been recognised
 				option_recognised = true;
+				it->toggle_is_parsed();
 
 				if( it->is_boolean() ){
 					it->set_var(true);
 				}
 				else{
-                    i++; // increase i
+               i++; // increase i
 					// check if there is an argument after
-					if(i==argc || has_option(argv[i]) ){
+					if(i==argc || has_option(op::stripPrefixDashes(argv[i])) ){
 						cout << "Non boolean option " << arg << " needs an argument !" << endl;
 						return false;
 					}
@@ -180,6 +191,15 @@ bool op::OptionParser::parse_options(int& argc, char**& argv){
 			return false;
 		}
 	}
+
+	// check that required arguments have been found
+	for( vector<Option>::iterator it=options.begin(); it!=options.end(); it++ ){
+		if( it->is_required() && !it->is_parsed()){
+			cout << "Required option was not found: " + it->get_long_name();
+			return false;
+		}
+	}
+
 	return true;
 }
 
@@ -200,7 +220,7 @@ string op::OptionParser::operator[](string name) const{
 
 	// if option is not recognised
 	if(!option_recognised){
-		throw string( "Unknown option " + name );
+		throw std::runtime_error( "Unknown option " + name );
 	}
 	
 	return var;

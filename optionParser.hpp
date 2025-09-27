@@ -29,6 +29,8 @@ float str2float(string value);
 /* convert a string to an int */
 double str2double(string value);
 
+/* strips a string from prefix dashes - or -- */
+std::string stripPrefixDashes(const std::string& str);
 
 /* CLASS OPTION  ===================================
 
@@ -41,12 +43,14 @@ protected:
 	string var, default_value;
 	string short_name, long_name, description;
 	bool _is_boolean;
+	bool _is_required;
+	bool _is_parsed;
 
 public:
-	Option(string short_name, string long_name, string description, string default_value);
+	Option(string short_name, string long_name, string description, string default_value, bool is_required);
 
 	/* create a boolean option */
-	Option(string short_name, string long_name, string description, bool default_value);
+	Option(string short_name, string long_name, string description, bool default_value, bool is_required);
 
 	~Option(){}
     
@@ -57,12 +61,13 @@ public:
     string get_var() const{ return var;}
     void set_var(string& new_var){ var = new_var;}
     void set_var(bool new_val){ var = bool2str(new_val);}
+    void toggle_is_parsed(){ _is_parsed = true;}
+
     bool is_boolean(){return _is_boolean;}
+    bool is_required(){return _is_required;}
+    bool is_parsed(){return _is_parsed;}
 
 };
-
-
-
 
 
 
@@ -103,10 +108,10 @@ public:
 	/* Shows help with aligned columns */	
 	void show_help();
 
-	void add_option(string short_name, string long_name, string description, string default_value);
+	void add_option(string short_name, string long_name, string description, string default_value, bool required);
 
 	/* to add a boolean option */	
-	void add_option(string short_name, string long_name, string description);
+	void add_option(string short_name, string long_name, string description, bool required);
 
 	/* This function changes default option values to those which are read on the command line */	
 	bool parse_options(int& argc, char**& argv);

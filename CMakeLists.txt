@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 4.0)
+
 add_executable (option_parser_main main.cpp optionParser.cpp optionParser.hpp)
 add_library (option_parser optionParser.cpp optionParser.hpp)
 

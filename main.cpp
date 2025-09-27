@@ -11,10 +11,10 @@ int main(int argc, char* argv[]){
 
 	// create a OptionParser with options
 	op::OptionParser opt;
-	opt.add_option("h", "help", "shows option help"); // no default value means boolean options, which default value is false
-	opt.add_option("w", "window_size", "window's size", "256" );
-	opt.add_option("r", "rate", "learning rate", "0.01" );
-	opt.add_option("m", "mode", "learning mode", "random" );
+	opt.add_option("h", "help", "shows option help", false); // no default value means boolean options, which default value is false
+	opt.add_option("w", "window_size", "window's size", "256", false );
+	opt.add_option("r", "rate", "learning rate", "", true ); // setting true indicates that the option is required
+	opt.add_option("m", "mode", "learning mode", "random", false );
 
 	// parse the options and verify that all went well. If not, errors and help will be shown
 	bool correct_parsing = opt.parse_options(argc, argv);
